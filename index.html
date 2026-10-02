@@ -26,7 +26,7 @@ body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
  <div class="top"><div class="title">成人识字</div><div class="count" id="count">1 / 100</div></div>
  <div class="track"><div class="progress" id="progress"></div></div>
  <div class="card" id="card"><div class="picture" id="picture"></div><div class="word" id="word">缴费</div><div class="meaning hidden" id="meaning">交钱、支付费用</div></div>
- <div class="help">点卡片看解释 · 左滑上一张 · 右滑下一张</div>
+ <div class="help">点卡片看解释 · 左滑下一张 · 右滑上一张</div>
  <button id="speak" style="width:100%;background:#e8efff;margin-bottom:12px" type="button">🔊 朗读词语</button>
  <div id="speechStatus" role="status" aria-live="polite" style="text-align:center;color:#666;font-size:14px;min-height:20px;margin-bottom:8px"></div>
  <div class="actions"><button class="no" id="no">× 不认识</button><button class="yes" id="yes">✓ 认识</button></div>
@@ -216,14 +216,14 @@ speakButton.addEventListener("click",function(){
 });
 document.addEventListener("visibilitychange",function(){if(document.hidden)stopSpeech()});
 function go(d){index=Math.max(0,Math.min(cards.length-1,index+d));render()}
-card.addEventListener("click",function(){flipped=!flipped;word.className=flipped?"word hidden":"word";meaning.className=flipped?"meaning":"meaning hidden";stopSpeech()});
+card.addEventListener("click",function(e){if(Date.now()<ignoreCardClickUntil){e.preventDefault();return}flipped=!flipped;word.className=flipped?"word hidden":"word";meaning.className=flipped?"meaning":"meaning hidden";stopSpeech()});
 document.getElementById("prev").addEventListener("click",function(){go(-1)});
 document.getElementById("next").addEventListener("click",function(){go(1)});
 document.getElementById("yes").addEventListener("click",function(){marks[index]="yes";if(index<cards.length-1)index++;render()});
 document.getElementById("no").addEventListener("click",function(){marks[index]="no";if(index<cards.length-1)index++;render()});
-var startX=0,startY=0,swiped=false;
+var startX=0,startY=0,swiped=false,ignoreCardClickUntil=0;
 card.addEventListener("touchstart",function(e){var t=e.changedTouches[0];startX=t.clientX;startY=t.clientY;swiped=false},{passive:true});
-card.addEventListener("touchend",function(e){var t=e.changedTouches[0],dx=t.clientX-startX,dy=t.clientY-startY;if(Math.abs(dx)>55&&Math.abs(dx)>Math.abs(dy)*1.25){swiped=true;if(dx<0)go(-1);else go(1)}},{passive:true});
+card.addEventListener("touchend",function(e){var t=e.changedTouches[0],dx=t.clientX-startX,dy=t.clientY-startY;if(Math.abs(dx)>55&&Math.abs(dx)>Math.abs(dy)*1.25){swiped=true;ignoreCardClickUntil=Date.now()+500;if(dx<0)go(1);else go(-1)}},{passive:true});
 render();
 </script>
 </body></html>
