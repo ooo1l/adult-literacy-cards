@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>成人识字卡</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;color:#111}
+body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+.app{max-width:560px;margin:0 auto;padding:22px 18px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.title{font-size:22px;font-weight:700}.count{color:#666}
+.track{height:6px;background:#ddd;border-radius:8px;overflow:hidden;margin-bottom:20px}.progress{height:100%;background:#111;transition:width .2s}
+.card{height:430px;max-height:55vh;min-height:330px;background:#fff;border-radius:28px;display:flex;align-items:center;justify-content:center;text-align:center;padding:28px;box-shadow:0 7px 25px rgba(0,0,0,.08);touch-action:pan-y;-webkit-user-select:none;user-select:none;cursor:pointer}
+.word{font-size:clamp(54px,16vw,84px);font-weight:750;letter-spacing:.05em}.meaning{font-size:29px;line-height:1.55}.hidden{display:none}
+.help{text-align:center;color:#777;font-size:14px;margin:14px 0 17px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:13px}button{min-height:54px;border:0;border-radius:17px;background:#fff;font-size:19px;font-weight:650;box-shadow:0 2px 10px rgba(0,0,0,.06);color:#111}.no{background:#fdeaea}.yes{background:#e6f6ea}
+.status{text-align:center;height:25px;color:#666;font-size:14px;margin-top:10px}.nav{display:flex;justify-content:space-between;gap:12px}.nav button{min-height:46px;padding:0 18px;font-size:16px}
+</style>
+</head>
+<body>
+<div class="app">
+ <div class="top"><div class="title">成人识字</div><div class="count" id="count">1 / 100</div></div>
+ <div class="track"><div class="progress" id="progress"></div></div>
+ <div class="card" id="card"><div class="word" id="word">缴费</div><div class="meaning hidden" id="meaning">交钱、支付费用</div></div>
+ <div class="help">点卡片看解释 · 左滑上一张 · 右滑下一张</div>
+ <div class="actions"><button class="no" id="no">× 不认识</button><button class="yes" id="yes">✓ 认识</button></div>
+ <div class="status" id="status"></div>
+ <div class="nav"><button id="prev">← 上一张</button><button id="next">下一张 →</button></div>
+</div>
+<script>
+var cards = [["缴费", "交钱、支付费用"], ["报销", "按规定把花的钱领回来"], ["余额", "账户里还剩多少钱"], ["转账", "把钱从一个账户转到另一个账户"], ["收款", "收到别人支付的钱"], ["退款", "把已经支付的钱退回来"], ["账单", "记录需要支付或已经支付的钱"], ["存款", "存在银行里的钱"], ["取款", "从银行取出钱"], ["利息", "存钱或借钱产生的钱"], ["贷款", "向银行等机构借钱"], ["逾期", "超过规定期限"], ["欠款", "应该支付但还没有支付的钱"], ["发票", "购买商品或服务后的凭证"], ["收据", "收到钱或物品后的凭证"], ["医保", "医疗保险的简称"], ["社保", "社会保险的简称"], ["体检", "检查身体健康情况"], ["检查", "查看有没有问题"], ["治疗", "用医疗方法处理疾病"], ["症状", "身体不舒服时表现出来的情况"], ["过敏", "身体对某些东西产生异常反应"], ["血压", "血液流动时对血管产生的压力"], ["空腹", "一段时间没有吃东西"], ["处方", "医生开出的用药单"], ["剂量", "一次或一天使用药物的多少"], ["服用", "吃药或喝药"], ["禁忌", "不应该做或使用的事情"], ["急诊", "紧急情况下看病的地方"], ["住院", "留在医院接受治疗"], ["出院", "结束住院并离开医院"], ["预约", "提前约定时间"], ["候诊", "等待医生看诊"], ["科室", "医院或单位里的专业部门"], ["身份证", "证明个人身份的证件"], ["驾驶证", "证明可以驾驶车辆的证件"], ["有效期", "可以正常使用的期限"], ["到期", "规定期限已经到了"], ["办理", "按照手续处理事情"], ["申请", "提出要求，请求办理某件事"], ["审核", "检查是否符合规定"], ["批准", "同意某项申请或要求"], ["拒绝", "不同意、不接受"], ["确认", "确定事情没有问题"], ["取消", "把原来的安排停止"], ["修改", "把原来的内容改变"], ["提交", "把材料交上去"], ["证明", "能够说明事实的材料"], ["资料", "办理或了解事情需要的信息材料"], ["证件", "证明身份或资格的文件"], ["签字", "写下自己的姓名表示确认"], ["合同", "双方约定权利和责任的文件"], ["协议", "双方商量后达成的约定"], ["责任", "应该承担的事情和后果"], ["赔偿", "因造成损失而补偿对方"], ["违约", "没有按照约定办事"], ["期限", "规定的时间范围"], ["通知", "把事情告诉有关的人"], ["公告", "公开发布给大家看的通知"], ["提醒", "让别人注意或记住某件事"], ["警告", "提醒可能有危险或问题"], ["禁止", "不允许做"], ["危险", "可能造成伤害或损失"], ["紧急", "事情很急，需要马上处理"], ["故障", "机器或设备出了问题"], ["维修", "检查并修理坏掉的东西"], ["暂停", "暂时停止"], ["恢复", "重新回到原来的状态"], ["营业", "商店或单位正在对外服务"], ["歇业", "暂时或停止营业"], ["营业时间", "商店对外服务的时间"], ["排队", "按照先后顺序等待"], ["窗口", "办理业务或提供服务的位置"], ["柜台", "商店、银行等办理业务的台面"], ["取号", "领取排队使用的号码"], ["凭证", "可以证明某件事情的单据或材料"], ["验证码", "用来确认身份的一组数字或文字"], ["登录", "进入自己的账户或系统"], ["退出", "离开账户、系统或某个页面"], ["设置", "调整手机或设备的功能"], ["更新", "把软件或内容换成较新的版本"], ["下载", "把网上的内容保存到设备里"], ["安装", "把软件装到手机或电脑里"], ["删除", "把不需要的内容去掉"], ["保存", "把内容留下来以后使用"], ["扫描", "用手机或机器读取图片、文字或二维码"], ["二维码", "用手机扫描后可以打开信息的方形图案"], ["定位", "确定人或设备所在的位置"], ["导航", "帮助找到前往目的地的路线"], ["路线", "从一个地方到另一个地方走的道路"], ["绕行", "不走原来的路，从别的路通过"], ["施工", "正在修建或维修道路、房屋等"], ["拥堵", "车辆很多，道路不通畅"], ["限速", "限制车辆行驶速度"], ["违章", "违反交通等管理规定"], ["罚款", "违反规定后被要求交钱"], ["停车场", "专门停放车辆的地方"], ["临时", "短时间的，不是长期的"], ["附近", "距离这里比较近的地方"], ["目的地", "准备前往的地方"]];
+var index=0, flipped=false, marks={};
+try{index=parseInt(localStorage.getItem("literacySafariIndex")||"0",10)||0;marks=JSON.parse(localStorage.getItem("literacySafariMarks")||"{}")}catch(e){}
+if(index<0||index>=cards.length)index=0;
+var card=document.getElementById("card"),word=document.getElementById("word"),meaning=document.getElementById("meaning");
+function save(){try{localStorage.setItem("literacySafariIndex",String(index));localStorage.setItem("literacySafariMarks",JSON.stringify(marks))}catch(e){}}
+function render(){flipped=false;word.className="word";meaning.className="meaning hidden";word.textContent=cards[index][0];meaning.textContent=cards[index][1];document.getElementById("count").textContent=(index+1)+" / "+cards.length;document.getElementById("progress").style.width=((index+1)/cards.length*100)+"%";document.getElementById("status").textContent=marks[index]==="yes"?"已标记：✓ 认识":marks[index]==="no"?"已标记：× 不认识":"";save()}
+function go(d){index=Math.max(0,Math.min(cards.length-1,index+d));render()}
+card.addEventListener("click",function(){flipped=!flipped;word.className=flipped?"word hidden":"word";meaning.className=flipped?"meaning":"meaning hidden"});
+document.getElementById("prev").addEventListener("click",function(){go(-1)});
+document.getElementById("next").addEventListener("click",function(){go(1)});
+document.getElementById("yes").addEventListener("click",function(){marks[index]="yes";if(index<cards.length-1)index++;render()});
+document.getElementById("no").addEventListener("click",function(){marks[index]="no";if(index<cards.length-1)index++;render()});
+var startX=0,startY=0,swiped=false;
+card.addEventListener("touchstart",function(e){var t=e.changedTouches[0];startX=t.clientX;startY=t.clientY;swiped=false},{passive:true});
+card.addEventListener("touchend",function(e){var t=e.changedTouches[0],dx=t.clientX-startX,dy=t.clientY-startY;if(Math.abs(dx)>55&&Math.abs(dx)>Math.abs(dy)*1.25){swiped=true;if(dx<0)go(-1);else go(1)}},{passive:true});
+render();
+</script>
+</body></html>
