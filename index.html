@@ -52,10 +52,9 @@ speakButton.addEventListener("click",function(){
  u.onerror=function(e){if(token===speechToken&&e.error!=="canceled"&&e.error!=="interrupted"){speechStatus.textContent="朗读未能播放，请检查音量后重试";currentSpeech=null}};
  window.speechSynthesis.speak(u);
 });
-card.addEventListener("click",function(){stopSpeech()});
 document.addEventListener("visibilitychange",function(){if(document.hidden)stopSpeech()});
 function go(d){index=Math.max(0,Math.min(cards.length-1,index+d));render()}
-card.addEventListener("click",function(){flipped=!flipped;word.className=flipped?"word hidden":"word";meaning.className=flipped?"meaning":"meaning hidden"});
+card.addEventListener("click",function(){flipped=!flipped;word.className=flipped?"word hidden":"word";meaning.className=flipped?"meaning":"meaning hidden";stopSpeech()});
 document.getElementById("prev").addEventListener("click",function(){go(-1)});
 document.getElementById("next").addEventListener("click",function(){go(1)});
 document.getElementById("yes").addEventListener("click",function(){marks[index]="yes";if(index<cards.length-1)index++;render()});
